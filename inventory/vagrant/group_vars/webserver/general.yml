@@ -11,3 +11,11 @@ php_max_input_time: 1000
 php_max_execution_time: 1000
 php_date_timezone: "America/Toronto"
 php_memory_limit: 1G
+
+## MAYBE?
+drupal_owner: vagrant
+drupal_group: vagrant
+riprap_content_type: "asu_repository_item"
+php_packages_extra:
+  - ext-intl
+  - zip

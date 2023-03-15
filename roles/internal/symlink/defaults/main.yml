@@ -1,0 +1,13 @@
+drupal_owner: ubuntu
+drupal_group: ubuntu
+drupal_private_dir: /var/www/html/private
+
+recaptcha_site_key: ''
+recaptcha_secret_key: ''
+
+hdl_prefix: ''
+hdl_qualifier: ''
+hdl_admin_handle: ''
+hdl_admin_index: ''
+hdl_handle_api_endpoint: ''
+hdl_handle_basic_auth_password: ''

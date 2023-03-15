@@ -1,0 +1,11 @@
+---
+
+- hosts: webserver
+  become: yes
+
+  vars:
+    php_version: "7.1"
+
+  roles:
+    - geerlingguy.drush
+    - asu-common

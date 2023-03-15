@@ -21,6 +21,8 @@
       when: islandora_build_base_box|bool == True
     - name: geerlingguy.composer
       when: islandora_build_base_box|bool == True
+    - name: symlink
+      when: islandora_build_base_box|bool == False
     - name: geerlingguy.drush  # Include drush as drupal-openseadragon needs it.
       when: islandora_build_base_box|bool == False
 
@@ -31,6 +33,10 @@
     - name: Islandora-Devops.drupal-openseadragon
       when: islandora_build_base_box|bool == False
     - name: webserver-app
+      when: islandora_build_base_box|bool == False
+    - name: Islandora-Devops.riprap
+      when: islandora_build_base_box|bool == False
+    - name: Islandora-Devops.bagger
       when: islandora_build_base_box|bool == False
     - name: Islandora-Devops.matomo
       when: "webserver_install_matomo and islandora_build_base_box|bool == False"

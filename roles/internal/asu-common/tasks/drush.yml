@@ -1,0 +1,18 @@
+- name: Disable CSS agg
+  command: "{{ drush_path }} --root {{ drupal_core_path }} -y config:set system.performance css.preprocess 0"
+  args:
+    chdir: /var/www/html/drupal/web
+
+
+- name: Disable JS agg
+  command: "{{ drush_path }} --root {{ drupal_core_path }} -y config:set system.performance js.preprocess 0"
+  args:
+    chdir: /var/www/html/drupal/web
+
+- name: run asu_taxonomies migrations
+  command: '{{ drush_path }} --root {{drupal_core_path}} migrate:import --group asu_taxonomies'
+  args:
+    chdir: /var/www/html/drupal/web
+
+- name: disable handle
+  command: '{{ drush_path }} --root {{ drupal_core_path }} -y config:set asu_default_fields.settings disable_handle_generation 1'

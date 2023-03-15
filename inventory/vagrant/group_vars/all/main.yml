@@ -53,3 +53,10 @@ webserver_install_fits: true
 
 post_install_chown_defaults: true
 post_install_migrate_import_fits_tags: false
+
+## MAYBE?
+httpd_conf_directory: "/etc/apache2"
+httpd_conf_directory_enabled: "{{httpd_conf_directory}}/conf-enabled"
+drush_path: "/usr/local/bin/drush"
+crayfish_drupal_base_url: "http://{{ hostvars[groups['webserver'][0]].ansible_host }}:{{ apache_listen_port }}"
+crayfish_db_host: 127.0.0.1

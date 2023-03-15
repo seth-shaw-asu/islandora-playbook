@@ -1,0 +1,72 @@
+---
+
+- hosts: webserver
+  become: yes
+
+  vars:
+    php_version: "8.1"
+    prism_hostname: "prism-dev.lib.asu.edu"
+    prism_directory: /var/www/html/drupal/web/sites/prism.lib.asu.edu
+    prism_themes:
+      - asulib_barrio
+
+  tasks:
+    - name: create prism directory
+      file:
+        path: "{{ prism_directory }}"
+        state: directory
+        owner: ubuntu
+        group: www-data
+        mode: 0775
+
+    - name: copy example.sites.php
+      copy:
+        src: /var/www/html/drupal/web/sites/example.sites.php
+        dest: /var/www/html/drupal/web/sites/sites.php
+        remote_src: True
+
+    - name: add new site to sites.php
+      lineinfile:
+        path: "/var/www/html/drupal/web/sites/sites.php"
+        line: "$sites['prism-dev.lib.asu.edu'] = 'prism.lib.asu.edu';"
+
+    - name: edit apache config
+      blockinfile:
+        path: "/etc/apache2/sites-enabled/islandora.conf"
+        block: |
+          <VirtualHost *:443>
+            ServerName prism-dev.lib.asu.edu
+            DocumentRoot "/var/www/html/drupal/web"
+            SSLEngine on
+            SSLCipherSuite AES256+EECDH:AES256+EDH
+            SSLProtocol All -SSLv2 -SSLv3
+            SSLHonorCipherOrder On
+            SSLCompression off
+            SSLCertificateFile /etc/ssl/private/__lib_asu_edu.cer
+            SSLCertificateKeyFile /etc/ssl/private/__lib_asu_edu.key
+            <Directory "/var/www/html/drupal/web">
+              AllowOverride All
+              Options -Indexes +FollowSymLinks
+              Require all granted
+            </Directory>
+            RewriteEngine On
+            RewriteCond %{HTTPS} !=on
+            RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+          </VirtualHost>
+    - name: create a new settings.php from default.settings.php in the sites/prism directory
+      copy:
+        src: /var/www/html/drupal/web/sites/default/default.settings.php
+        dest: "{{ prism_directory }}/settings.php"
+        mode: '0777'
+        remote_src: True
+
+    - name: Import PRISM's configurations
+      command: >
+        {{ drush_path }} --uri=http://{{ prism_hostname }} cim -y {{ prism_modules | join(" ") }}
+        --root={{ prism_directory }}
+      args:
+        chdir: "{{ prism_directory }}"
+      become: no
+
+    - name: disable handle
+      command: '{{ drush_path }} --root {{ drupal_core_path }} --uri=http://{{ prism_hostname }} -y config:set asu_default_fields.settings disable_handle_generation 1'

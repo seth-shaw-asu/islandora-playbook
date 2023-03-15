@@ -6,7 +6,7 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.require_version ">= 2.0.1"
 
-$cpus   = ENV.fetch("ISLANDORA_VAGRANT_CPUS", "1")
+$cpus   = ENV.fetch("ISLANDORA_VAGRANT_CPUS", "2")
 $memory = ENV.fetch("ISLANDORA_VAGRANT_MEMORY", "4096")
 $hostname = ENV.fetch("ISLANDORA_VAGRANT_HOSTNAME", "islandora8")
 $virtualBoxDescription = ENV.fetch("ISLANDORA_VAGRANT_VIRTUALBOXDESCRIPTION", "Islandora 8")
@@ -28,7 +28,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if $buildBaseBox
       v.name = "Islandora 8 Ansible Base Box"
     else
-      v.name = "Islandora 8 Ansible Sandbox Instance"
+      v.name = "Islandora 8 ASU Instance"
     end
   end
 

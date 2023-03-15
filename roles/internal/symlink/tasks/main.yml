@@ -1,0 +1,161 @@
+---
+
+- name: make the drupal root
+  file:
+    path: /var/www/html/drupal
+    state: directory
+    mode: 0775
+    owner: "{{webserver_app_user}}"
+    group: "{{webserver_app_user}}"
+    force: no
+  become: true
+  ignore_errors: yes
+
+- name: check if rules file exists
+  stat:
+    path: /var/www/html/drupal/web
+  register: drupal_exists
+
+- name: Set Git Safe Directory
+  command: git config --global --add safe.directory /var/www/html/drupal
+  check_mode: no
+
+- name: clone the ASU project
+  git:
+    repo: 'https://github.com/asulibraries/islandora-repo'
+    dest: /var/www/html/drupal
+    version: playbook
+    recursive: true
+  when: drupal_exists.stat.exists == False
+
+
+- name: change composer permissions
+  file:
+    path: /var/www/html/drupal/composer.json
+    mode: 0777
+- name: change composer permissions
+  file:
+    path: /var/www/html/drupal/composer.lock
+    mode: 0777
+
+- name: change drupal root permissions
+  file:
+    path: /var/www/html/drupal
+    state: directory
+    recurse: yes
+    owner: "{{ drupal_owner }}"
+    group: "{{ drupal_group }}"
+    # owner: "{{webserver_app_user}}"
+    # group: "{{webserver_app_user}}"
+
+- name: change vendor permissions
+  file:
+    path: /var/www/html/drupal/vendor
+    state: directory
+    recurse: yes
+    mode: 0775
+    owner: "{{ drupal_owner }}"
+    group: "{{ drupal_group }}"
+    # owner: "{{webserver_app_user}}"
+    # group: "{{webserver_app_user}}"
+- name: Run composer install if composer.json
+  composer:
+    command: install
+    working_dir: /var/www/html/drupal
+#   become_user: "{{webserver_app_user}}"
+  become_user: "{{ drupal_owner }}"
+- name: make sure we have controlled_access_terms and up to date
+  composer:
+    command: update
+    arguments: islandora/controlled_access_terms
+    working_dir: /var/www/html/drupal
+#   become_user: "{{webserver_app_user}}"
+  become_user: "{{ drupal_owner }}"
+
+- name: make private files directory
+  file:
+    path: "{{ drupal_private_dir }}"
+    state: directory
+    owner: "{{webserver_app_user}}"
+    group: "{{webserver_app_user}}"
+    mode: 0775
+# TODO change the settings.php file to reflect
+
+# Clone the non-composer modules
+
+- name: clone ASU fork of persistent identifiers
+  git:
+    dest: "{{drupal_core_path}}/modules/contrib/persistent_identifiers"
+    repo: https://github.com/asulibraries/persistent_identifiers.git
+    clone: yes
+    update: yes
+    version: override_qualifier
+
+- name: ensures {{ drupal_core_path }}/../config/env* dir exists
+  file: 
+    path: "{{ drupal_core_path }}/../config/{{ item }}"
+    state: directory
+    group: www-data
+  loop:
+    - env_keep
+    - env_prism
+    - env
+
+- name: Copy Env Files
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  loop:
+    - { src: 'env_keep/views.view.media_of.yml', dest: '{{ drupal_core_path }}/../config/env_keep/views.view.media_of.yml' }
+    - { src: 'env_keep/views.view.legacy_checksum_compare_2.yml', dest: '{{ drupal_core_path }}/../config/env_keep/views.view.legacy_checksum_compare_2.yml' }
+    - { src: 'env_prism/views.view.media_of.yml', dest: '{{ drupal_core_path }}/../config/env_prism/views.view.media_of.yml' }
+    - { src: 'env_prism/views.view.legacy_checksum_compare_2.yml', dest: '{{ drupal_core_path }}/../config/env_prism/views.view.legacy_checksum_compare_2.yml' }
+
+- name: template Env variables
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+  loop:
+    - { src: 'env/hdl.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env/hdl.settings.yml' }
+    - { src: 'env/islandora_iiif.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env/islandora_iiif.settings.yml' }
+    - { src: 'env/islandora.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env/islandora.settings.yml' }
+    - { src: 'env/recaptcha_v3.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env/recaptcha_v3.settings.yml' }
+    - { src: 'env/key.key.islandora_rsa_key.yml.j2', dest: '{{ drupal_core_path }}/../config/env/recaptcha_v3.settings.yml' }
+    - { src: 'env_keep/context.context.open_seadragon.yml.j2', dest: '{{ drupal_core_path }}/../config/env_keep/.context.context.open_seadragonyml' }
+    - { src: 'env_keep/context.context.openseadragon_block.yml.j2', dest: '{{ drupal_core_path }}/../config/env_keep/context.context.openseadragon_block.yml' }
+    - { src: 'env_keep/islandora_riprap.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env_keep/islandora_riprap.settings.yml' }
+    - { src: 'env_keep/matomo.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env_keep/matomo.settings.yml' }
+    - { src: 'env_keep/s3fs.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env_keep/.s3fs.settingsyml' }
+    - { src: 'env_keep/search_api.server.default_solr_server.yml.j2', dest: '{{ drupal_core_path }}/../config/env_keep/search_api.server.default_solr_server.yml' }
+    - { src: 'env_keep/simple_sitemap.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env_keep/simple_sitemap.settings.yml' }
+    - { src: 'env_prism/context.context.open_seadragon.yml.j2', dest: '{{ drupal_core_path }}/../config/env_prism/context.context.open_seadragon.yml' }
+    - { src: 'env_prism/context.context.openseadragon_block.yml.j2', dest: '{{ drupal_core_path }}/../config/env_prism/context.context.openseadragon_block.yml' }
+    - { src: 'env_prism/islandora_riprap.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env_prism/islandora_riprap.settings.yml' }
+    - { src: 'env_prism/matomo.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env_prism/matomo.settings.yml' }
+    - { src: 'env_prism/s3fs.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env_prism/s3fs.settings.yml' }
+    - { src: 'env_prism/search_api.server.default_solr_server.yml.j2', dest: '{{ drupal_core_path }}/../config/env_prism/search_api.server.default_solr_server.yml' }
+    - { src: 'env_prism/simple_sitemap.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env_prism/simple_sitemap.settings.yml' }
+
+- name: Enable KEEP site configs
+  blockinfile:
+    state: present
+    block: |
+      $settings['flysystem'] = [
+        'fedora' => [
+          'driver' => 'fedora',
+          'config' => [
+            'root' => '{{ fedora_base_url }}',
+          ],
+        ],
+      ];
+    path: "{{ drupal_site_default_settings }}"
+    marker: // {mark} ANSIBLE MANAGED BLOCK - fedora flysystem scheme
+
+- name: Creates CSS optimized directory
+  file: 
+    path: "{{ drupal_core_path }}/web/sites/{{ item }}/files/css/optimized"
+    state: directory
+    group: www-data
+  loop:
+    - default
+    - prism.lib.asu.edu
