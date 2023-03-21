@@ -120,7 +120,7 @@
     - { src: 'env/islandora_iiif.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env/islandora_iiif.settings.yml' }
     - { src: 'env/islandora.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env/islandora.settings.yml' }
     - { src: 'env/recaptcha_v3.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env/recaptcha_v3.settings.yml' }
-    - { src: 'env/key.key.islandora_rsa_key.yml.j2', dest: '{{ drupal_core_path }}/../config/env/recaptcha_v3.settings.yml' }
+    - { src: 'env/key.key.islandora_rsa_key.yml.j2', dest: '{{ drupal_core_path }}/../config/env/key.key.islandora_rsa_key.yml' }
     - { src: 'env_keep/context.context.open_seadragon.yml.j2', dest: '{{ drupal_core_path }}/../config/env_keep/.context.context.open_seadragonyml' }
     - { src: 'env_keep/context.context.openseadragon_block.yml.j2', dest: '{{ drupal_core_path }}/../config/env_keep/context.context.openseadragon_block.yml' }
     - { src: 'env_keep/islandora_riprap.settings.yml.j2', dest: '{{ drupal_core_path }}/../config/env_keep/islandora_riprap.settings.yml' }
