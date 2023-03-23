@@ -9,3 +9,4 @@
   roles:
     - geerlingguy.drush
     - asu-common
+    - Islandora-Devops.riprap

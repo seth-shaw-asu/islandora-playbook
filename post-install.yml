@@ -109,6 +109,9 @@
         mode: 0775
         recurse: yes
 
+    - name: Load Access Terms
+      command: "{{ drush_path }} --root {{ drupal_core_path }} scr {{ drupal_composer_install_dir }}/scripts/migrate_access_terms.php"
+
     - name: Clear cache
       command: "{{ drush_path }} --root {{ drupal_core_path }} -y cr"
 
