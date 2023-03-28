@@ -5,7 +5,7 @@
 
 This fork contains revisions to support building an Islandora with ASU customizations.
 **It is not perfect**, there are gaps and a lot of things don't work without additional manual configuration.
-This is in large part due to how Drupal blends configuration and content, many things can't *just work* without importing a lot of content with very specific identifiers.
+This is in large part due to how Drupal blends configuration and content, many things can't *just work* without importing a lot of content with very specific identifiers. For example, the display_media view's thumbnail display has a filter on field_media_use_target_id set to 22, which is "Thumbnail" in production but "OpenSeadragon" on the most recent version of this playbook. It needs to be reset to work properly.
 
 To work on a feature, make sure you have the relevant pieces of content replicated and configuration adjusted so it works properly for your test case *then create a VM snapshot*
 so you can bring it back to that state if needed during the development process.
