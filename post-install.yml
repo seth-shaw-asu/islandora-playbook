@@ -112,6 +112,9 @@
     - name: Load Access Terms
       command: "{{ drush_path }} --root {{ drupal_core_path }} scr {{ drupal_composer_install_dir }}/scripts/migrate_access_terms.php"
 
+    - name: Create self-deposit Fedora location
+      command: "{{ drush_path }} --root {{ drupal_core_path }} ev 'if(!file_exists(\"fedora://c160/\")){mkdir(\"fedora://c160/\", 0777, true);}'"
+
     - name: Clear cache
       command: "{{ drush_path }} --root {{ drupal_core_path }} -y cr"
 
