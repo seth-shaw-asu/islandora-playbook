@@ -1,6 +1,15 @@
 # Islandora Playbook
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](./LICENSE)
 
+## FORKED
+
+This fork contains revisions to support building an Islandora with ASU customizations.
+**It is not perfect**, there are gaps and a lot of things don't work without additional manual configuration.
+This is in large part due to how Drupal blends configuration and content, many things can't *just work* without importing a lot of content with very specific identifiers.
+
+To work on a feature, make sure you have the relevant pieces of content replicated and configuration adjusted so it works properly for your test case *then create a VM snapshot*
+so you can bring it back to that state if needed during the development process.
+
 ## Introduction
 
 This is an Ansible playbook for provisioning an instance of Islandora. This repository can be used with Vagrant, or for deploying to a remote server.
