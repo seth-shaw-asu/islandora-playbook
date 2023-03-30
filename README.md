@@ -10,6 +10,8 @@ This is in large part due to how Drupal blends configuration and content, many t
 To work on a feature, make sure you have the relevant pieces of content replicated and configuration adjusted so it works properly for your test case *then create a VM snapshot*
 so you can bring it back to that state if needed during the development process.
 
+To have the playbook pull in a specific fork and/or branch of islandora-repo, modify the 'repo' and 'version' properties of the "clone the ASU project" task in `roles/internal/symlink/tasks/main.yml`.
+
 ## Introduction
 
 This is an Ansible playbook for provisioning an instance of Islandora. This repository can be used with Vagrant, or for deploying to a remote server.

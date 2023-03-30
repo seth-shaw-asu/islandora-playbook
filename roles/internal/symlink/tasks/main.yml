@@ -23,6 +23,7 @@
 - name: clone the ASU project
   git:
     repo: 'https://github.com/asulibraries/islandora-repo'
+    version: 'develop'
     dest: /var/www/html/drupal
     recursive: true
   when: drupal_exists.stat.exists == False
