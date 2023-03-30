@@ -24,10 +24,14 @@
   git:
     repo: 'https://github.com/asulibraries/islandora-repo'
     dest: /var/www/html/drupal
-    version: playbook
     recursive: true
   when: drupal_exists.stat.exists == False
 
+- name: swap install profile
+  replace:
+    regexp: 'standard'
+    replace: 'minimal'
+    path: /var/www/html/drupal/config/sync/core.extension.yml
 
 - name: change composer permissions
   file:
